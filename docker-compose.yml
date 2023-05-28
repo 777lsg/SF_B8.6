@@ -1,0 +1,29 @@
+version: '3.3'
+services:
+  php:
+    build: .
+    container_name: php
+    restart: always
+    volumes:
+      - /app01/www/:/var/www/:ro
+
+  nginx:
+    image: nginx
+    container_name: nginx
+    restart: always
+    volumes:
+      - /app01/www/:/var/www/:ro
+      - /app01/nginx/dev.conf:/etc/nginx/conf.d/default.conf:ro
+    ports:
+      # Оставить доступ только для локальной машины      - '127.0.0.1:80:80'
+      #  - '0.0.0.0:80:80'
+      - '80:80'
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "curl -f http://127.0.0.1:80/index.php | grep -q 'works'"
+        ]
+      interval: 10s
+      timeout: 10s
+      retries: 5
